@@ -1,4 +1,11 @@
 import { useState, useEffect } from "react";
+import { createRoot } from "react-dom/client";
+
+// localStorage wrapper matching the old window.storage API
+const storage = {
+  get: (key) => Promise.resolve(localStorage.getItem(key) ? { value: localStorage.getItem(key) } : null),
+  set: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
+};
 
 const PROFILE = { calories: 1900, netCarbs: 25, protein: 150, fat: 120 };
 const HEALTH = { stepsGoal: 10000, stepsAvg: 8614, rhr: 64, activeCalAvg: 612, workoutHRMax: 176 };
@@ -93,21 +100,21 @@ export default function KetoTracker() {
   useEffect(() => {
     (async () => {
       try {
-        const e = await window.storage.get("kt_entries"); if (e) setEntries(JSON.parse(e.value));
-        const w = await window.storage.get("kt_weight"); if (w) setWeight(JSON.parse(w.value));
-        const b = await window.storage.get("kt_bp"); if (b) setBp(JSON.parse(b.value));
-        const s = await window.storage.get("kt_steps"); if (s) setSteps(JSON.parse(s.value));
-        const cf = await window.storage.get("kt_custom"); if (cf) setCustomFoods(JSON.parse(cf.value));
+        const e = await storage.get("kt_entries"); if (e) setEntries(JSON.parse(e.value));
+        const w = await storage.get("kt_weight"); if (w) setWeight(JSON.parse(w.value));
+        const b = await storage.get("kt_bp"); if (b) setBp(JSON.parse(b.value));
+        const s = await storage.get("kt_steps"); if (s) setSteps(JSON.parse(s.value));
+        const cf = await storage.get("kt_custom"); if (cf) setCustomFoods(JSON.parse(cf.value));
       } catch {}
       setLoaded(true);
     })();
   }, []);
 
-  useEffect(() => { if (loaded) window.storage.set("kt_entries", JSON.stringify(entries)).catch(() => {}); }, [entries, loaded]);
-  useEffect(() => { if (loaded) window.storage.set("kt_weight", JSON.stringify(weight)).catch(() => {}); }, [weight, loaded]);
-  useEffect(() => { if (loaded) window.storage.set("kt_bp", JSON.stringify(bp)).catch(() => {}); }, [bp, loaded]);
-  useEffect(() => { if (loaded) window.storage.set("kt_steps", JSON.stringify(steps)).catch(() => {}); }, [steps, loaded]);
-  useEffect(() => { if (loaded) window.storage.set("kt_custom", JSON.stringify(customFoods)).catch(() => {}); }, [customFoods, loaded]);
+  useEffect(() => { if (loaded) storage.set("kt_entries", JSON.stringify(entries)).catch(() => {}); }, [entries, loaded]);
+  useEffect(() => { if (loaded) storage.set("kt_weight", JSON.stringify(weight)).catch(() => {}); }, [weight, loaded]);
+  useEffect(() => { if (loaded) storage.set("kt_bp", JSON.stringify(bp)).catch(() => {}); }, [bp, loaded]);
+  useEffect(() => { if (loaded) storage.set("kt_steps", JSON.stringify(steps)).catch(() => {}); }, [steps, loaded]);
+  useEffect(() => { if (loaded) storage.set("kt_custom", JSON.stringify(customFoods)).catch(() => {}); }, [customFoods, loaded]);
 
   const showToast = (msg, err = false) => { setToast(msg); setToastErr(err); setTimeout(() => setToast(""), 2500); };
 
@@ -612,3 +619,6 @@ export default function KetoTracker() {
     </div>
   );
 }
+
+// Mount the app
+createRoot(document.getElementById("root")).render(<KetoTracker />);

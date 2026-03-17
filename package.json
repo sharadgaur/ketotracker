@@ -1,6 +1,6 @@
 {
   "name": "ketotracker",
-  "homepage": "https://sharadgaur.github.io",
+  "homepage": "https://sharadgaur.github.io/ketotracker",
   "scripts": {
     "start": "vite",
     "build": "vite build",
